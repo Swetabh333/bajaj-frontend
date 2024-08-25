@@ -1,35 +1,71 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
+import axiosInstance from "./api/axios";
+import Select from "react-select";
 function App() {
-  const [count, setCount] = useState(0)
+  const [input, setInput] = useState("");
+  const [response, setResponse] = useState(null);
+  const [error, setError] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState([]);
+
+  const options = [
+    { value: "alphabets", label: "Alphabets" },
+    { value: "numbers", label: "Numbers" },
+    {
+      value: "highest_lowercase_alphabet",
+      label: "Highest lowercase alphabet",
+    },
+  ];
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setResponse(null);
+
+    try {
+      const parsedInput = JSON.parse(input);
+      const result = await axiosInstance.post("/bfhl", parsedInput);
+      setResponse(result.data);
+    } catch (err) {
+      setError("Invalid JSON input or API error");
+    }
+  };
+
+  const renderResponse = () => {
+    if (!response) return null;
+
+    return selectedOptions.map((option) => (
+      <div key={option.value}>
+        <h3>{option.label}</h3>
+        <p>{JSON.stringify(response[option.value])}</p>
+      </div>
+    ));
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      <h1>Your Roll Number</h1>
+      <form onSubmit={handleSubmit}>
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Enter JSON input"
+        />
+        <button type="submit">Submit</button>
+      </form>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {response && (
+        <Select
+          isMulti
+          options={options}
+          onChange={setSelectedOptions}
+          placeholder="Select response fields"
+        />
+      )}
+      {renderResponse()}
+    </div>
+  );
 }
-
-export default App
+export default App;
