@@ -66,6 +66,7 @@ function App() {
           style={{
             width: "500px",
             backgroundColor: "blue",
+            color: "white",
             display: "block",
             marginBottom: "10px",
           }}
