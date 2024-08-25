@@ -26,7 +26,9 @@ function App() {
 
     try {
       const parsedInput = JSON.parse(input);
-      const result = await axiosInstance.post("/bfhl", parsedInput);
+      const result = await axiosInstance.post("/bfhl", parsedInput, {
+        withCredentials: false,
+      });
       setResponse(result.data);
     } catch (err) {
       setError("Invalid JSON input or API error");
@@ -46,14 +48,30 @@ function App() {
 
   return (
     <div>
-      <h1>Your Roll Number</h1>
+      <h1>Enter data</h1>
       <form onSubmit={handleSubmit}>
         <textarea
+          style={{
+            display: "block",
+            width: "500px",
+            marginBottom: "10px",
+          }}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Enter JSON input"
         />
-        <button type="submit">Submit</button>
+        <button
+          type="submit"
+          className="btn"
+          style={{
+            width: "500px",
+            backgroundColor: "blue",
+            display: "block",
+            marginBottom: "10px",
+          }}
+        >
+          Submit
+        </button>
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {response && (
